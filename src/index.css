@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html, body {
+  @apply bg-background-default text-white;
+  overflow: hidden;
+  height: 100%;
+}
+
+#root {
+  height: 100%;
+}
+
+@layer components {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-background-paper;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-gray-600 rounded-full;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-500;
+  }
+  
+  .tag-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    @apply bg-primary-700/30 text-primary-300;
+    @apply transition-all duration-200;
+  }
+  
+  .tag-badge:hover {
+    @apply bg-primary-600/40;
+  }
+  
+  .model-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    @apply bg-secondary-700/30 text-secondary-300;
+    @apply transition-all duration-200;
+  }
+  
+  .model-badge:hover {
+    @apply bg-secondary-600/40;
+  }
+  
+  .prompt-card {
+    @apply bg-background-paper rounded-md p-4;
+    @apply transition-all duration-200 border border-transparent;
+    @apply hover:border-primary-700 hover:shadow-lg;
+  }
+  
+  .prompt-card.selected {
+    @apply border-primary-500 bg-background-paper;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 bg-background-dark rounded-md;
+    @apply border border-gray-700 focus:border-primary-500;
+    @apply outline-none focus:ring-1 focus:ring-primary-500;
+    @apply text-white placeholder-gray-400;
+    @apply transition-all duration-200;
+  }
+  
+  .btn {
+    @apply px-4 py-2 rounded-md font-medium;
+    @apply transition-all duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background-paper;
+  }
+  
+  .btn-primary {
+    @apply btn bg-primary-600 hover:bg-primary-700 focus:ring-primary-500;
+    @apply text-white;
+  }
+  
+  .btn-secondary {
+    @apply btn bg-secondary-600 hover:bg-secondary-700 focus:ring-secondary-500;
+    @apply text-white;
+  }
+  
+  .btn-danger {
+    @apply btn bg-error-600 hover:bg-error-700 focus:ring-error-500;
+    @apply text-white;
+  }
+  
+  .btn-ghost {
+    @apply btn bg-transparent hover:bg-gray-700/50;
+    @apply text-gray-300 hover:text-white;
+  }
+}
