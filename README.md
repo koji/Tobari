@@ -1,4 +1,4 @@
-# AI Prompt Manager
+# AI Prompt Manager Tobari ~帳~
 
 A powerful desktop application for organizing, managing, and reusing AI image generation prompts. Built with React, TypeScript, and Electron.
 
