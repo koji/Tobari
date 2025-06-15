@@ -2,6 +2,11 @@
 
 A powerful desktop application for organizing, managing, and reusing AI image generation prompts. Built with React, TypeScript, and Electron.
 
+
+![Screenshot 2025-06-15 at 1 18 31 AM](https://github.com/user-attachments/assets/67854083-b24a-4112-af78-dd35aee7d992)
+
+
+
 ## Features
 
 - 📝 **Prompt Management**: Create, edit, and organize your AI prompts with titles, descriptions, and notes
