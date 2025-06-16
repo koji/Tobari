@@ -1,28 +1,37 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
-import { join } from 'path';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import Store from 'electron-store';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const store = new Store();
 
-const createWindow = () => {
+const createWindow = async () => {
   const mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     minWidth: 800,
     minHeight: 600,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: join(__dirname, 'preload.js')
     }
   });
 
-  // In development, load from Vite dev server
-  if (process.env.NODE_ENV === 'development') {
-    mainWindow.loadURL('http://localhost:5173');
+  // Check if we're in development by testing if Vite dev server is running
+  const isDev = process.env.VITE_DEV_SERVER_URL || process.env.NODE_ENV === 'development';
+  
+  if (isDev) {
+    // In development, load from Vite dev server
+    const devServerUrl = process.env.VITE_DEV_SERVER_URL || 'http://localhost:5173';
+    await mainWindow.loadURL(devServerUrl);
     mainWindow.webContents.openDevTools();
   } else {
     // In production, load from built files
-    mainWindow.loadFile(join(__dirname, '../dist/index.html'));
+    await mainWindow.loadFile(join(__dirname, '../dist/index.html'));
   }
 };
 

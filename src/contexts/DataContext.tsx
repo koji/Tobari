@@ -1,8 +1,19 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ipcRenderer } from 'electron';
 import { Prompt, Tag, AIModel, ImageData, Toast, FilterState } from '../types';
 import { formatISO } from 'date-fns';
+
+// Declare the electron API type
+declare global {
+  interface Window {
+    electronAPI: {
+      store: {
+        get: (key: string) => Promise<any>;
+        set: (key: string, value: any) => Promise<void>;
+      };
+    };
+  }
+}
 
 // Default sample data
 const defaultTags: Tag[] = [
@@ -94,12 +105,17 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 // Update storage operations to use electron-store
 const saveToStore = async (key: string, value: any) => {
-  await ipcRenderer.invoke('store-set', key, value);
+  if (window.electronAPI) {
+    await window.electronAPI.store.set(key, value);
+  }
 };
 
 const loadFromStore = async (key: string, defaultValue: any) => {
-  const value = await ipcRenderer.invoke('store-get', key);
-  return value === undefined ? defaultValue : value;
+  if (window.electronAPI) {
+    const value = await window.electronAPI.store.get(key);
+    return value === undefined ? defaultValue : value;
+  }
+  return defaultValue;
 };
 
 // Provider component

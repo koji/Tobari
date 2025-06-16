@@ -9,12 +9,13 @@
     "build": "tsc && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "electron:dev": "concurrently \"vite\" \"electron .\"",
+    "electron:dev": "vite",
     "electron:build": "tsc && vite build && electron-builder",
     "electron:preview": "electron ."
   },
   "dependencies": {
     "date-fns": "^3.3.1",
+    "electron-store": "^10.0.1",
     "lucide-react": "^0.344.0",
     "react": "^18.3.1",
     "react-beautiful-dnd": "^13.1.1",
@@ -32,7 +33,6 @@
     "concurrently": "^8.2.2",
     "electron": "^29.4.6",
     "electron-builder": "^24.13.3",
-    "electron-store": "^10.0.1",
     "eslint": "^9.9.1",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.11",
@@ -57,7 +57,10 @@
     ],
     "mac": {
       "category": "public.app-category.graphics-design",
-      "target": "universal"
+      "target": {
+        "target": "dmg",
+        "arch": "universal"
+      }
     },
     "win": {
       "target": "nsis"
