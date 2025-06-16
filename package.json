@@ -56,7 +56,8 @@
       "electron/**/*"
     ],
     "mac": {
-      "category": "public.app-category.graphics-design"
+      "category": "public.app-category.graphics-design",
+      "target": "universal"
     },
     "win": {
       "target": "nsis"
