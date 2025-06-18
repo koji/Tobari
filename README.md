@@ -55,6 +55,34 @@ npm run electron:build
 
 Built applications will be available in the `dist-electron` directory.
 
+### Using the Makefile
+
+For more granular control over the build process, you can use the provided `Makefile`:
+
+-   **Build for all platforms (macOS, Windows, Linux):**
+    ```bash
+    make all
+    ```
+-   **Build for macOS (Universal):**
+    ```bash
+    make build-mac
+    ```
+-   **Build for Windows:**
+    ```bash
+    make build-windows
+    ```
+-   **Build for Linux:**
+    ```bash
+    make build-linux
+    ```
+-   **Clean build artifacts:**
+    Removes the `dist-electron` directory.
+    ```bash
+    make clean
+    ```
+
+Built applications will still be available in the `dist-electron` directory.
+
 ## Available Scripts
 
 - `npm run dev` - Start Vite development server only
@@ -166,4 +194,3 @@ If you encounter any issues or have questions, please [open an issue](https://gi
 - Built with [Electron](https://electronjs.org/)
 - UI components from [Lucide](https://lucide.dev/)
 - Styled with [Tailwind CSS](https://tailwindcss.com/)
-
