@@ -94,12 +94,30 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 // Update storage operations to use electron-store
 const saveToStore = async (key: string, value: any) => {
-  await ipcRenderer.invoke('store-set', key, value);
+  console.log(`[Renderer] saveToStore: Saving key '${key}'. Value type: ${typeof value}, Array length (if applicable): ${Array.isArray(value) ? value.length : 'N/A'}`);
+  try {
+    await ipcRenderer.invoke('store-set', key, value);
+    console.log(`[Renderer] saveToStore: Successfully invoked store-set for key '${key}'`);
+  } catch (error) {
+    console.error(`[Renderer] saveToStore: Error invoking store-set for key '${key}':`, error);
+  }
 };
 
 const loadFromStore = async (key: string, defaultValue: any) => {
-  const value = await ipcRenderer.invoke('store-get', key);
-  return value === undefined ? defaultValue : value;
+  console.log(`[Renderer] loadFromStore: Loading key '${key}'`);
+  try {
+    const value = await ipcRenderer.invoke('store-get', key);
+    if (value === undefined) {
+      console.log(`[Renderer] loadFromStore: Key '${key}' not found in store, using default value. Default value type: ${typeof defaultValue}, Array length: ${Array.isArray(defaultValue) ? defaultValue.length : 'N/A'}`);
+      return defaultValue;
+    }
+    console.log(`[Renderer] loadFromStore: Key '${key}' loaded from store. Value type: ${typeof value}, Array length: ${Array.isArray(value) ? value.length : 'N/A'}`);
+    return value;
+  } catch (error) {
+    console.error(`[Renderer] loadFromStore: Error invoking store-get for key '${key}':`, error);
+    console.log(`[Renderer] loadFromStore: Using default value for key '${key}' due to error. Default value type: ${typeof defaultValue}, Array length: ${Array.isArray(defaultValue) ? defaultValue.length : 'N/A'}`);
+    return defaultValue;
+  }
 };
 
 // Provider component
@@ -115,39 +133,62 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   // Update useEffect hooks to use electron-store
   useEffect(() => {
-    saveToStore('prompts', prompts);
+    console.log(`[Renderer] useEffect for 'prompts': Prompts changed, attempting to save. Count: ${prompts.length}`);
+    if (prompts !== defaultPrompts || prompts.length > 0) { // Avoid saving initial default state if it hasn't changed or is empty
+      saveToStore('prompts', prompts);
+    }
   }, [prompts]);
   
   useEffect(() => {
-    saveToStore('tags', tags);
+    console.log(`[Renderer] useEffect for 'tags': Tags changed, attempting to save. Count: ${tags.length}`);
+    if (tags !== defaultTags || tags.length > 0) {
+      saveToStore('tags', tags);
+    }
   }, [tags]);
   
   useEffect(() => {
-    saveToStore('models', models);
+    console.log(`[Renderer] useEffect for 'models': Models changed, attempting to save. Count: ${models.length}`);
+    if (models !== defaultModels || models.length > 0) {
+      saveToStore('models', models);
+    }
   }, [models]);
   
   useEffect(() => {
-    saveToStore('images', images);
+    console.log(`[Renderer] useEffect for 'images': Images changed, attempting to save. Count: ${images.length}`);
+    if (images.length > 0) { // Images start empty, so only save if not empty
+      saveToStore('images', images);
+    }
   }, [images]);
   
   // Initial data loading
   useEffect(() => {
     const loadInitialData = async () => {
-      const [savedPrompts, savedTags, savedModels, savedImages] = await Promise.all([
+      console.log('[Renderer] loadInitialData: Starting initial data load.');
+
+      const [loadedPrompts, loadedTags, loadedModels, loadedImages] = await Promise.all([
         loadFromStore('prompts', defaultPrompts),
         loadFromStore('tags', defaultTags),
         loadFromStore('models', defaultModels),
         loadFromStore('images', [])
       ]);
       
-      setPrompts(savedPrompts);
-      setTags(savedTags);
-      setModels(savedModels);
-      setImages(savedImages);
+      console.log(`[Renderer] loadInitialData: Prompts loaded. Count: ${loadedPrompts.length}. IsDefault: ${loadedPrompts === defaultPrompts}`);
+      setPrompts(loadedPrompts);
+
+      console.log(`[Renderer] loadInitialData: Tags loaded. Count: ${loadedTags.length}. IsDefault: ${loadedTags === defaultTags}`);
+      setTags(loadedTags);
+
+      console.log(`[Renderer] loadInitialData: Models loaded. Count: ${loadedModels.length}. IsDefault: ${loadedModels === defaultModels}`);
+      setModels(loadedModels);
+
+      console.log(`[Renderer] loadInitialData: Images loaded. Count: ${loadedImages.length}.`);
+      setImages(loadedImages);
+
+      console.log('[Renderer] loadInitialData: Finished initial data load and setting state.');
     };
     
     loadInitialData();
-  }, []);
+  }, []); // Empty dependency array, runs once on mount.
   
   // Prompt CRUD operations
   const addPrompt = (promptData: Omit<Prompt, 'id' | 'created_at' | 'updated_at'>): string => {

@@ -42,11 +42,44 @@ app.on('window-all-closed', () => {
   }
 });
 
+let quitting = false;
+app.on('will-quit', (event) => {
+  if (quitting) {
+    return; // Avoid re-entry if app.quit() is called again
+  }
+  quitting = true;
+  console.log('[Main] app.will-quit: Application is about to quit.');
+  // Prevent immediate quit
+  event.preventDefault();
+
+  // Give some time for any pending async operations (like electron-store writes)
+  // to complete. 300ms is a pragmatic choice.
+  setTimeout(() => {
+    console.log('[Main] app.will-quit: Proceeding with quit after delay.');
+    app.quit(); // This will now quit without re-triggering the delay logic
+  }, 300);
+});
+
 // Handle data persistence
 ipcMain.handle('store-get', (event, key) => {
-  return store.get(key);
+  try {
+    console.log(`[Main] store-get: Attempting to get key '${key}'`);
+    const value = store.get(key);
+    console.log(`[Main] store-get: Successfully retrieved key '${key}'. Value found: ${value !== undefined}`);
+    return value;
+  } catch (error) {
+    console.error(`[Main] store-get: Error getting key '${key}':`, error);
+    return undefined; // Return undefined to mimic key not found on error
+  }
 });
 
 ipcMain.handle('store-set', (event, key, value) => {
-  store.set(key, value);
+  try {
+    console.log(`[Main] store-set: Attempting to set key '${key}'. Value type: ${typeof value}, Array length (if applicable): ${Array.isArray(value) ? value.length : 'N/A'}`);
+    store.set(key, value);
+    console.log(`[Main] store-set: Successfully set key '${key}'`);
+  } catch (error) {
+    console.error(`[Main] store-set: Error setting key '${key}':`, error);
+    // Optionally, re-throw or handle as needed, for now, just log
+  }
 });
