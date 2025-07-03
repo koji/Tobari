@@ -65,27 +65,28 @@ interface DataContextType {
   toasts: Toast[];
   filters: FilterState;
   selectedPromptId: string | null;
-  
+
   addPrompt: (prompt: Omit<Prompt, 'id' | 'created_at' | 'updated_at'>) => string;
   updatePrompt: (id: string, promptData: Partial<Prompt>) => void;
   deletePrompt: (id: string) => void;
   selectPrompt: (id: string | null) => void;
-  
+
   addTag: (label: string) => string;
   deleteTag: (id: string) => void;
-  
+
   addModel: (label: string) => string;
   deleteModel: (id: string) => void;
-  
-  attachImage: (promptId: string, imageData: string, name: string) => void;
+
+  attachImage: (promptId: string, dataUrl: string, name: string) => void;
   deleteImage: (promptId: string, imageName: string) => void;
-  
+  loadImageUrl: (imageId: string) => Promise<string | null>;
+
   addToast: (type: Toast['type'], message: string) => void;
   removeToast: (id: string) => void;
-  
+
   updateFilters: (newFilters: Partial<FilterState>) => void;
   resetFilters: () => void;
-  
+
   filteredPrompts: Prompt[];
 }
 
@@ -102,6 +103,19 @@ const loadFromStore = async (key: string, defaultValue: any) => {
   return value === undefined ? defaultValue : value;
 };
 
+// Image handling functions
+const saveImageToFile = async (imageId: string, imageData: string) => {
+  return await ipcRenderer.invoke('save-image', imageId, imageData);
+};
+
+const loadImageFromFile = async (imageId: string) => {
+  return await ipcRenderer.invoke('load-image', imageId);
+};
+
+const deleteImageFile = async (imageId: string) => {
+  await ipcRenderer.invoke('delete-image', imageId);
+};
+
 // Provider component
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // State
@@ -112,43 +126,104 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [filters, setFilters] = useState<FilterState>(initialFilters);
   const [selectedPromptId, setSelectedPromptId] = useState<string | null>(null);
-  
-  // Update useEffect hooks to use electron-store
-  useEffect(() => {
-    saveToStore('prompts', prompts);
-  }, [prompts]);
-  
-  useEffect(() => {
-    saveToStore('tags', tags);
-  }, [tags]);
-  
-  useEffect(() => {
-    saveToStore('models', models);
-  }, [models]);
-  
-  useEffect(() => {
-    saveToStore('images', images);
-  }, [images]);
-  
-  // Initial data loading
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Initial data loading - this should run first
   useEffect(() => {
     const loadInitialData = async () => {
-      const [savedPrompts, savedTags, savedModels, savedImages] = await Promise.all([
-        loadFromStore('prompts', []),
-        loadFromStore('tags', defaultTags),
-        loadFromStore('models', defaultModels),
-        loadFromStore('images', [])
-      ]);
-      
-      setPrompts(savedPrompts);
-      setTags(savedTags);
-      setModels(savedModels);
-      setImages(savedImages);
+      try {
+        const [savedPrompts, savedTags, savedModels, savedImages] = await Promise.all([
+          loadFromStore('prompts', []),
+          loadFromStore('tags', defaultTags),
+          loadFromStore('models', defaultModels),
+          loadFromStore('images', [])
+        ]);
+
+        // Migrate old image data if needed
+        const migratedImages = await migrateImageData(savedImages);
+
+        setPrompts(savedPrompts);
+        setTags(savedTags);
+        setModels(savedModels);
+        setImages(migratedImages);
+        setIsLoaded(true);
+      } catch (error) {
+        console.error('Failed to load data:', error);
+        setIsLoaded(true);
+      }
     };
-    
+
     loadInitialData();
   }, []);
-  
+
+  // Migration function for old image data
+  const migrateImageData = async (images: ImageData[]): Promise<ImageData[]> => {
+    const migratedImages: ImageData[] = [];
+
+    for (const image of images) {
+      // If image has url but no filePath, it's old format
+      if (image.url && !image.filePath) {
+        try {
+          // Save the base64 data to file
+          const filePath = await saveImageToFile(image.id, image.url);
+
+          // Create new image object with filePath instead of url
+          const migratedImage: ImageData = {
+            ...image,
+            filePath,
+            url: undefined // Remove the large base64 data
+          };
+
+          migratedImages.push(migratedImage);
+          console.log(`Migrated image: ${image.name}`);
+        } catch (error) {
+          console.error(`Failed to migrate image ${image.name}:`, error);
+          // Keep the old format if migration fails
+          migratedImages.push(image);
+        }
+      } else {
+        // Already in new format or no url
+        migratedImages.push(image);
+      }
+    }
+
+    // Save migrated data back to store
+    if (migratedImages.length > 0) {
+      await saveToStore('images', migratedImages);
+    }
+
+    return migratedImages;
+  };
+
+  // Save data to store only after initial loading is complete
+  useEffect(() => {
+    if (isLoaded) {
+      saveToStore('prompts', prompts);
+    }
+  }, [prompts, isLoaded]);
+
+  useEffect(() => {
+    if (isLoaded) {
+      saveToStore('tags', tags);
+    }
+  }, [tags, isLoaded]);
+
+  useEffect(() => {
+    if (isLoaded) {
+      saveToStore('models', models);
+    }
+  }, [models, isLoaded]);
+
+  useEffect(() => {
+    if (isLoaded) {
+      // For images, we need to be more careful due to size
+      // Only save if images array is not empty or if we're clearing it
+      if (images.length > 0 || isLoaded) {
+        saveToStore('images', images);
+      }
+    }
+  }, [images, isLoaded]);
+
   // Prompt CRUD operations
   const addPrompt = (promptData: Omit<Prompt, 'id' | 'created_at' | 'updated_at'>): string => {
     const now = formatISO(new Date());
@@ -158,21 +233,21 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       created_at: now,
       updated_at: now,
     };
-    
+
     setPrompts(prev => [...prev, newPrompt]);
     addToast('success', 'Prompt created successfully');
     return newPrompt.id;
   };
-  
+
   const updatePrompt = (id: string, promptData: Partial<Prompt>) => {
-    setPrompts(prev => prev.map(prompt => 
-      prompt.id === id 
-        ? { ...prompt, ...promptData, updated_at: formatISO(new Date()) } 
+    setPrompts(prev => prev.map(prompt =>
+      prompt.id === id
+        ? { ...prompt, ...promptData, updated_at: formatISO(new Date()) }
         : prompt
     ));
     addToast('success', 'Prompt updated successfully');
   };
-  
+
   const deletePrompt = (id: string) => {
     setPrompts(prev => prev.filter(prompt => prompt.id !== id));
     setImages(prev => prev.filter(image => image.promptId !== id));
@@ -181,23 +256,23 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     addToast('info', 'Prompt deleted');
   };
-  
+
   const selectPrompt = (id: string | null) => {
     setSelectedPromptId(id);
   };
-  
+
   // Tag operations
   const addTag = (label: string): string => {
     const id = label.toLowerCase().replace(/\s+/g, '-');
     if (tags.some(tag => tag.id === id)) {
       return id; // Tag already exists
     }
-    
+
     const newTag: Tag = { id, label };
     setTags(prev => [...prev, newTag]);
     return id;
   };
-  
+
   const deleteTag = (id: string) => {
     setTags(prev => prev.filter(tag => tag.id !== id));
     // Remove the tag from all prompts
@@ -207,19 +282,19 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       updated_at: formatISO(new Date())
     })));
   };
-  
+
   // Model operations
   const addModel = (label: string): string => {
     const id = label.toLowerCase().replace(/\s+/g, '-');
     if (models.some(model => model.id === id)) {
       return id; // Model already exists
     }
-    
+
     const newModel: AIModel = { id, label };
     setModels(prev => [...prev, newModel]);
     return id;
   };
-  
+
   const deleteModel = (id: string) => {
     setModels(prev => prev.filter(model => model.id !== id));
     // Remove the model from all prompts
@@ -229,114 +304,145 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       updated_at: formatISO(new Date())
     })));
   };
-  
+
   // Image operations
-  const attachImage = (promptId: string, dataUrl: string, name: string) => {
+  const attachImage = async (promptId: string, dataUrl: string, name: string) => {
     const id = uuidv4();
     const imageName = `image_${id}_${name}`;
-    
-    // Add image to images collection
-    const newImage: ImageData = {
-      id,
-      promptId,
-      name: imageName,
-      url: dataUrl,
-      created_at: formatISO(new Date())
-    };
-    
-    setImages(prev => [...prev, newImage]);
-    
-    // Update prompt's linked_images
-    setPrompts(prev => prev.map(prompt => 
-      prompt.id === promptId
-        ? { 
-            ...prompt, 
+
+    try {
+      // Save image to file
+      const filePath = await saveImageToFile(id, dataUrl);
+
+      // Add image to images collection (without the large data URL)
+      const newImage: ImageData = {
+        id,
+        promptId,
+        name: imageName,
+        filePath,
+        created_at: formatISO(new Date())
+      };
+
+      setImages(prev => [...prev, newImage]);
+
+      // Update prompt's linked_images
+      setPrompts(prev => prev.map(prompt =>
+        prompt.id === promptId
+          ? {
+            ...prompt,
             linked_images: [...prompt.linked_images, imageName],
             updated_at: formatISO(new Date())
           }
-        : prompt
-    ));
-    
-    addToast('success', 'Image attached successfully');
+          : prompt
+      ));
+
+      addToast('success', 'Image attached successfully');
+    } catch (error) {
+      console.error('Failed to save image:', error);
+      addToast('error', 'Failed to save image');
+    }
   };
-  
-  const deleteImage = (promptId: string, imageName: string) => {
-    // Remove from images collection
-    setImages(prev => prev.filter(img => !(img.promptId === promptId && img.name === imageName)));
-    
-    // Remove from prompt's linked_images
-    setPrompts(prev => prev.map(prompt => 
-      prompt.id === promptId
-        ? { 
-            ...prompt, 
+
+  const deleteImage = async (promptId: string, imageName: string) => {
+    try {
+      // Find the image to get its ID
+      const imageToDelete = images.find(img => img.promptId === promptId && img.name === imageName);
+
+      if (imageToDelete) {
+        // Delete the file
+        await deleteImageFile(imageToDelete.id);
+      }
+
+      // Remove from images collection
+      setImages(prev => prev.filter(img => !(img.promptId === promptId && img.name === imageName)));
+
+      // Remove from prompt's linked_images
+      setPrompts(prev => prev.map(prompt =>
+        prompt.id === promptId
+          ? {
+            ...prompt,
             linked_images: prompt.linked_images.filter(name => name !== imageName),
             updated_at: formatISO(new Date())
           }
-        : prompt
-    ));
-    
-    addToast('info', 'Image removed');
+          : prompt
+      ));
+
+      addToast('info', 'Image removed');
+    } catch (error) {
+      console.error('Failed to delete image:', error);
+      addToast('error', 'Failed to delete image');
+    }
   };
-  
+
+  // Load image data URL on demand
+  const loadImageUrl = async (imageId: string): Promise<string | null> => {
+    try {
+      return await loadImageFromFile(imageId);
+    } catch (error) {
+      console.error('Failed to load image:', error);
+      return null;
+    }
+  };
+
   // Toast operations
   const addToast = (type: Toast['type'], message: string) => {
     const id = uuidv4();
     const newToast: Toast = { id, type, message };
     setToasts(prev => [...prev, newToast]);
-    
+
     // Auto remove after 5 seconds
     setTimeout(() => {
       removeToast(id);
     }, 5000);
   };
-  
+
   const removeToast = (id: string) => {
     setToasts(prev => prev.filter(toast => toast.id !== id));
   };
-  
+
   // Filter operations
   const updateFilters = (newFilters: Partial<FilterState>) => {
     setFilters(prev => ({ ...prev, ...newFilters }));
   };
-  
+
   const resetFilters = () => {
     setFilters(initialFilters);
   };
-  
+
   // Computed filtered prompts
   const filteredPrompts = React.useMemo(() => {
     return prompts
       .filter(prompt => {
         // Text search
-        if (filters.searchText && !prompt.title.toLowerCase().includes(filters.searchText.toLowerCase()) && 
-            !prompt.prompt.toLowerCase().includes(filters.searchText.toLowerCase())) {
+        if (filters.searchText && !prompt.title.toLowerCase().includes(filters.searchText.toLowerCase()) &&
+          !prompt.prompt.toLowerCase().includes(filters.searchText.toLowerCase())) {
           return false;
         }
-        
+
         // Tag filter
-        if (filters.selectedTags.length > 0 && 
-            !filters.selectedTags.every(tagId => prompt.tags.includes(tagId))) {
+        if (filters.selectedTags.length > 0 &&
+          !filters.selectedTags.every(tagId => prompt.tags.includes(tagId))) {
           return false;
         }
-        
+
         // Model filter
-        if (filters.selectedModels.length > 0 && 
-            !filters.selectedModels.every(modelId => prompt.ai_models.includes(modelId))) {
+        if (filters.selectedModels.length > 0 &&
+          !filters.selectedModels.every(modelId => prompt.ai_models.includes(modelId))) {
           return false;
         }
-        
+
         return true;
       })
       .sort((a, b) => {
         const dateA = new Date(a[filters.sortBy]);
         const dateB = new Date(b[filters.sortBy]);
-        
-        return filters.sortDir === 'asc' 
+
+        return filters.sortDir === 'asc'
           ? dateA.getTime() - dateB.getTime()
           : dateB.getTime() - dateA.getTime();
       });
   }, [prompts, filters]);
-  
+
   const value = {
     prompts,
     tags,
@@ -345,30 +451,32 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     toasts,
     filters,
     selectedPromptId,
-    
+
     addPrompt,
     updatePrompt,
     deletePrompt,
     selectPrompt,
-    
+
     addTag,
     deleteTag,
-    
+
     addModel,
     deleteModel,
-    
+
     attachImage,
     deleteImage,
-    
+
+    loadImageUrl,
+
     addToast,
     removeToast,
-    
+
     updateFilters,
     resetFilters,
-    
+
     filteredPrompts
   };
-  
+
   return (
     <DataContext.Provider value={value}>
       {children}
