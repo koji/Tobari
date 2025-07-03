@@ -1,8 +1,31 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import { join } from 'path';
-import Store from 'electron-store';
+import { promises as fs } from 'fs';
 
-const store = new Store();
+const dataFilePath = join(app.getPath('userData'), 'tobari-data.json');
+const tempDataFilePath = join(app.getPath('userData'), 'tobari-data.json.tmp');
+
+async function readData() {
+  try {
+    const data = await fs.readFile(dataFilePath, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      return {}; // Return empty object if file doesn't exist
+    }
+    console.error('Failed to read data:', error);
+    return {};
+  }
+}
+
+async function writeData(data) {
+  try {
+    await fs.writeFile(tempDataFilePath, JSON.stringify(data, null, 2), 'utf8');
+    await fs.rename(tempDataFilePath, dataFilePath);
+  } catch (error) {
+    console.error('Failed to write data:', error);
+  }
+}
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
@@ -43,10 +66,13 @@ app.on('window-all-closed', () => {
 });
 
 // Handle data persistence
-ipcMain.handle('store-get', (event, key) => {
-  return store.get(key);
+ipcMain.handle('store-get', async (event, key) => {
+  const data = await readData();
+  return data[key];
 });
 
-ipcMain.handle('store-set', (event, key, value) => {
-  store.set(key, value);
+ipcMain.handle('store-set', async (event, key, value) => {
+  const data = await readData();
+  data[key] = value;
+  await writeData(data);
 });

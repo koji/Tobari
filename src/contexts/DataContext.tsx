@@ -105,7 +105,7 @@ const loadFromStore = async (key: string, defaultValue: any) => {
 // Provider component
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // State
-  const [prompts, setPrompts] = useState<Prompt[]>(defaultPrompts);
+  const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [tags, setTags] = useState<Tag[]>(defaultTags);
   const [models, setModels] = useState<AIModel[]>(defaultModels);
   const [images, setImages] = useState<ImageData[]>([]);
@@ -134,7 +134,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const loadInitialData = async () => {
       const [savedPrompts, savedTags, savedModels, savedImages] = await Promise.all([
-        loadFromStore('prompts', defaultPrompts),
+        loadFromStore('prompts', []),
         loadFromStore('tags', defaultTags),
         loadFromStore('models', defaultModels),
         loadFromStore('images', [])
