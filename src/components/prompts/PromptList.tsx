@@ -1,7 +1,7 @@
 import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { Image as ImageIcon } from 'lucide-react';
-import { useData } from '../../contexts/DataContext';
+import { useData } from '../../contexts/useData';
 import TagBadge from '../ui/TagBadge';
 import ModelBadge from '../ui/ModelBadge';
 

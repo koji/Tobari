@@ -1,5 +1,5 @@
 import React from 'react';
-import { useData } from '../../contexts/DataContext';
+import { useData } from '../../contexts/useData';
 import TagBadge from '../ui/TagBadge';
 
 const TagFilter: React.FC = () => {

@@ -1,8 +1,9 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { ipcRenderer } from 'electron';
 import { Prompt, Tag, AIModel, ImageData, Toast, FilterState } from '../types';
 import { formatISO } from 'date-fns';
+import { DataContext } from './data-context';
 
 // Default sample data
 const defaultTags: Tag[] = [
@@ -56,48 +57,22 @@ const initialFilters: FilterState = {
   sortDir: 'desc'
 };
 
-// Context type
-interface DataContextType {
+interface StoreData {
   prompts: Prompt[];
   tags: Tag[];
   models: AIModel[];
   images: ImageData[];
-  toasts: Toast[];
-  filters: FilterState;
-  selectedPromptId: string | null;
-  
-  addPrompt: (prompt: Omit<Prompt, 'id' | 'created_at' | 'updated_at'>) => string;
-  updatePrompt: (id: string, promptData: Partial<Prompt>) => void;
-  deletePrompt: (id: string) => void;
-  selectPrompt: (id: string | null) => void;
-  
-  addTag: (label: string) => string;
-  deleteTag: (id: string) => void;
-  
-  addModel: (label: string) => string;
-  deleteModel: (id: string) => void;
-  
-  attachImage: (promptId: string, imageData: string, name: string) => void;
-  deleteImage: (promptId: string, imageName: string) => void;
-  
-  addToast: (type: Toast['type'], message: string) => void;
-  removeToast: (id: string) => void;
-  
-  updateFilters: (newFilters: Partial<FilterState>) => void;
-  resetFilters: () => void;
-  
-  filteredPrompts: Prompt[];
 }
 
-// Create context
-const DataContext = createContext<DataContextType | undefined>(undefined);
-
 // Update storage operations to use electron-store
-const saveToStore = async (key: string, value: any) => {
+const saveToStore = async <K extends keyof StoreData>(key: K, value: StoreData[K]) => {
   await ipcRenderer.invoke('store-set', key, value);
 };
 
-const loadFromStore = async (key: string, defaultValue: any) => {
+const loadFromStore = async <K extends keyof StoreData>(
+  key: K,
+  defaultValue: StoreData[K]
+): Promise<StoreData[K]> => {
   const value = await ipcRenderer.invoke('store-get', key);
   return value === undefined ? defaultValue : value;
 };
@@ -374,13 +349,4 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       {children}
     </DataContext.Provider>
   );
-};
-
-// Custom hook to use the context
-export const useData = () => {
-  const context = useContext(DataContext);
-  if (context === undefined) {
-    throw new Error('useData must be used within a DataProvider');
-  }
-  return context;
 };

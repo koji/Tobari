@@ -4,7 +4,7 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 import PromptView from '../prompts/PromptView';
 import PromptList from '../prompts/PromptList';
-import { useData } from '../../contexts/DataContext';
+import { useData } from '../../contexts/useData';
 
 const Layout: React.FC = () => {
   const { selectedPromptId } = useData();

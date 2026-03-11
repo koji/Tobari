@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, CheckCircle, AlertCircle, Info } from 'lucide-react';
-import { useData } from '../../contexts/DataContext';
+import { useData } from '../../contexts/useData';
 
 export const Toaster: React.FC = () => {
   const { toasts, removeToast } = useData();
@@ -10,7 +10,7 @@ export const Toaster: React.FC = () => {
   return (
     <div className="fixed bottom-0 right-0 p-4 z-50 flex flex-col items-end space-y-2">
       {toasts.map(toast => {
-        let bgColor = 'bg-background-paper';
+        const bgColor = 'bg-background-paper';
         let icon = <Info className="h-5 w-5 text-white" />;
         let borderColor = 'border-l-primary-500';
         

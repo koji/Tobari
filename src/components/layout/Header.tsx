@@ -1,6 +1,6 @@
 import React from 'react';
 import { Sparkles, Plus } from 'lucide-react';
-import { useData } from '../../contexts/DataContext';
+import { useData } from '../../contexts/useData';
 
 interface HeaderProps {
   children?: React.ReactNode;

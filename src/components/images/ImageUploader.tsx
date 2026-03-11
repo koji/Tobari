@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Upload, Loader } from 'lucide-react';
-import { useData } from '../../contexts/DataContext';
+import { useData } from '../../contexts/useData';
 
 interface ImageUploaderProps {
   promptId: string;

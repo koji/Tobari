@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { X, ZoomIn, Download, Trash2 } from 'lucide-react';
-import { useData } from '../../contexts/DataContext';
+import { ZoomIn, Download, Trash2 } from 'lucide-react';
+import { useData } from '../../contexts/useData';
 import { ImageData } from '../../types';
 import ImageModal from './ImageModal';
 import ConfirmDialog from '../ui/ConfirmDialog';
