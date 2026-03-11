@@ -1,6 +1,6 @@
 import React from 'react';
 import { Search, Tag, Cpu, SlidersHorizontal, RotateCcw } from 'lucide-react';
-import { useData } from '../../contexts/DataContext';
+import { useData } from '../../contexts/useData';
 import PromptList from '../prompts/PromptList';
 import TagFilter from '../filters/TagFilter';
 import ModelFilter from '../filters/ModelFilter';

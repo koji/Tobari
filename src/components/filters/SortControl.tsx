@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
-import { useData } from '../../contexts/DataContext';
+import { useData } from '../../contexts/useData';
 
 const SortControl: React.FC = () => {
   const { filters, updateFilters } = useData();

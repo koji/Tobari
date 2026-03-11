@@ -1,5 +1,5 @@
 import React from 'react';
-import { useData } from '../../contexts/DataContext';
+import { useData } from '../../contexts/useData';
 import ModelBadge from '../ui/ModelBadge';
 
 const ModelFilter: React.FC = () => {
