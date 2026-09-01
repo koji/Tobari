@@ -277,11 +277,11 @@ const PromptView: React.FC = () => {
                 Images
               </div>
             </label>
-            <ImageUploader promptId={selectedPromptId} />
+            <ImageUploader promptId={selectedPrompt.id} />
           </div>
           
           <ImageGallery 
-            promptId={selectedPromptId} 
+            promptId={selectedPrompt.id} 
             images={promptImages} 
           />
         </div>
