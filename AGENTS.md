@@ -11,7 +11,7 @@
 
 ## Verify
 The change has to pass the following
-- npx tsc -p tsconfig.app.json --noEmit
-- bun run lint (oxlint)
-- npx knip --reporter json
-- bun run build
+- `npx tsc -p tsconfig.app.json --noEmit`
+- `bun run lint (oxlint)`
+- `npx knip --reporter json`
+- `bun run build`
