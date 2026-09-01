@@ -62,7 +62,8 @@ Built applications will be available in the `dist-electron` directory.
 - `npm run electron:dev` - Start both Vite and Electron in development mode
 - `npm run electron:build` - Build the Electron application for distribution
 - `npm run electron:preview` - Run the built Electron application
-- `npm run lint` - Run ESLint
+- `npm run lint` - Run Oxlint
+- `npm run lint:fix` - Run Oxlint with auto-fix
 - `npm run preview` - Preview the built web application
 
 ## Project Structure
@@ -132,7 +133,7 @@ interface AIModel {
 - **Drag & Drop**: React Beautiful DnD
 - **Data Storage**: Electron Store
 - **Date Handling**: date-fns
-- **Development**: ESLint, Concurrently
+- **Development**: Oxlint, Concurrently
 
 ## Contributing
 
