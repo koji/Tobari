@@ -29,9 +29,11 @@ const imagesDir = join(app.getPath('userData'), 'images');
 fs.mkdir(imagesDir, { recursive: true }).catch(console.error);
 
 // Add some debugging
-console.log('Electron store initialized at:', store.path);
-console.log('Images directory:', imagesDir);
-console.log('Store contents:', store.store);
+if (process.env.NODE_ENV === 'development') {
+  console.log('Electron store initialized at:', store.path);
+  console.log('Images directory:', imagesDir);
+  console.log('Store contents:', store.store);
+}
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
