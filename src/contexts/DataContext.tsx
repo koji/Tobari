@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { ipcRenderer } from 'electron';
 import { Prompt, Tag, AIModel, ImageData, Toast, FilterState } from '../types';
@@ -87,21 +87,26 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [filters, setFilters] = useState<FilterState>(initialFilters);
   const [selectedPromptId, setSelectedPromptId] = useState<string | null>(null);
+  const hasLoaded = useRef(false);
   
-  // Update useEffect hooks to use electron-store
+  // Persist to electron-store only after initial load
   useEffect(() => {
+    if (!hasLoaded.current) return;
     saveToStore('prompts', prompts);
   }, [prompts]);
   
   useEffect(() => {
+    if (!hasLoaded.current) return;
     saveToStore('tags', tags);
   }, [tags]);
   
   useEffect(() => {
+    if (!hasLoaded.current) return;
     saveToStore('models', models);
   }, [models]);
   
   useEffect(() => {
+    if (!hasLoaded.current) return;
     saveToStore('images', images);
   }, [images]);
   
@@ -119,6 +124,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setTags(savedTags);
       setModels(savedModels);
       setImages(savedImages);
+      hasLoaded.current = true;
     };
     
     loadInitialData();
