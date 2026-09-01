@@ -65,7 +65,7 @@ const PromptView: React.FC = () => {
       setNotes('');
       setHasChanges(false);
     }
-  }, [selectedPromptId]);
+  }, [selectedPromptId, prompts]);
 
   // Check for changes to enable/disable save button
   useEffect(() => {
