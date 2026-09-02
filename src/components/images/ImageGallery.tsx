@@ -27,7 +27,6 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ promptId, images }) => {
     if (imageToDelete) {
       deleteImage(promptId, imageToDelete.name);
       
-      // If the deleted image is currently being viewed, close the modal
       if (selectedImage && selectedImage.id === imageToDelete.id) {
         setSelectedImage(null);
       }
@@ -51,9 +50,9 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ promptId, images }) => {
   
   if (images.length === 0) {
     return (
-      <div className="border-2 border-dashed border-gray-700 rounded-md p-8 text-center">
-        <p className="text-gray-500">No images attached to this prompt</p>
-        <p className="text-sm text-gray-600 mt-1">
+      <div className="border border-dashed border-hairline rounded-lg p-8 text-center bg-canvas-parchment">
+        <p className="text-caption text-ink-muted-80">No images attached to this prompt</p>
+        <p className="text-fine-print text-ink-muted-48 mt-1">
           Upload images to associate them with this prompt
         </p>
       </div>
@@ -66,7 +65,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ promptId, images }) => {
         {images.map(image => (
           <div 
             key={image.id} 
-            className="relative group aspect-square bg-background-dark rounded-md overflow-hidden border border-gray-800"
+            className="relative group aspect-square bg-canvas rounded-lg overflow-hidden border border-hairline"
           >
             <img 
               src={image.url} 
@@ -74,29 +73,28 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ promptId, images }) => {
               className="w-full h-full object-cover"
             />
             
-            {/* Overlay with actions */}
-            <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center">
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center backdrop-blur-[2px]">
               <div className="flex space-x-2">
                 <button
                   onClick={() => handleOpenImage(image)}
-                  className="p-2 bg-background-paper rounded-full text-white hover:bg-primary-700 transition-colors"
+                  className="btn-icon-circular"
                   title="View"
                 >
-                  <ZoomIn size={18} />
+                  <ZoomIn size={16} />
                 </button>
                 <button
                   onClick={() => handleDownload(image)}
-                  className="p-2 bg-background-paper rounded-full text-white hover:bg-secondary-700 transition-colors"
+                  className="btn-icon-circular"
                   title="Download"
                 >
-                  <Download size={18} />
+                  <Download size={16} />
                 </button>
                 <button
                   onClick={() => setImageToDelete(image)}
-                  className="p-2 bg-background-paper rounded-full text-white hover:bg-error-700 transition-colors"
+                  className="btn-icon-circular hover:bg-red-500 hover:text-white"
                   title="Delete"
                 >
-                  <Trash2 size={18} />
+                  <Trash2 size={16} />
                 </button>
               </div>
             </div>
@@ -104,7 +102,6 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ promptId, images }) => {
         ))}
       </div>
       
-      {/* Image modal */}
       <ImageModal 
         image={selectedImage} 
         onClose={handleCloseImage}
@@ -116,7 +113,6 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ promptId, images }) => {
         onDownload={(image) => handleDownload(image)}
       />
       
-      {/* Delete confirmation dialog */}
       <ConfirmDialog
         isOpen={!!imageToDelete}
         title="Delete Image"

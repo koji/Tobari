@@ -9,12 +9,10 @@ const TagFilter: React.FC = () => {
     const currentTags = filters.selectedTags;
     
     if (currentTags.includes(tagId)) {
-      // Remove tag
       updateFilters({ 
         selectedTags: currentTags.filter(id => id !== tagId) 
       });
     } else {
-      // Add tag
       updateFilters({ 
         selectedTags: [...currentTags, tagId] 
       });
@@ -23,7 +21,7 @@ const TagFilter: React.FC = () => {
   
   if (tags.length === 0) {
     return (
-      <div className="text-sm text-gray-500 italic">No tags available</div>
+      <div className="text-caption text-ink-muted-48 italic">No tags available</div>
     );
   }
   

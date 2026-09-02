@@ -17,13 +17,13 @@ const ModelBadge: React.FC<ModelBadgeProps> = ({
 }) => {
   return (
     <div 
-      className={`model-badge cursor-pointer ${isSelected ? 'bg-secondary-500/50' : ''}`}
+      className={`model-badge cursor-pointer ${isSelected ? '!bg-ink !text-white !border-ink' : ''}`}
       onClick={onClick}
     >
       {model.label}
       {!hideRemove && (
         <X 
-          className="ml-1 h-3 w-3 hover:text-white" 
+          className="ml-1 h-3 w-3 opacity-60 hover:opacity-100" 
           onClick={(e) => {
             e.stopPropagation();
             onClick();
