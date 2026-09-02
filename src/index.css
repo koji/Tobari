@@ -3,17 +3,25 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
+/* SF Pro - Apple tightly tracked headlines, 17px body */
 html, body {
-  @apply bg-background-default text-white;
+  @apply bg-canvas-parchment text-ink antialiased;
+  font-family: 'SF Pro Text', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   overflow: hidden;
   height: 100%;
+  font-variant-numeric: proportional-nums;
 }
 
 #root {
   height: 100%;
+}
+
+/* Display headlines use SF Pro Display with negative tracking */
+h1, h2, h3 {
+  font-family: 'SF Pro Display', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 @layer components {
@@ -27,78 +35,132 @@ html, body {
   }
   
   .scrollbar-thin::-webkit-scrollbar-track {
-    @apply bg-background-paper;
+    @apply bg-canvas;
   }
   
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    @apply bg-gray-600 rounded-full;
+    @apply bg-zinc-300 rounded-full;
   }
   
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-500;
+    @apply bg-zinc-400;
   }
   
-  .tag-badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-    @apply bg-primary-700/30 text-primary-300;
-    @apply transition-all duration-200;
+  /* Apple tile surfaces */
+  .tile-light {
+    @apply bg-canvas text-ink;
   }
-  
-  .tag-badge:hover {
-    @apply bg-primary-600/40;
+  .tile-parchment {
+    @apply bg-canvas-parchment text-ink;
   }
-  
-  .model-badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-    @apply bg-secondary-700/30 text-secondary-300;
-    @apply transition-all duration-200;
+  .tile-dark {
+    @apply bg-tile-1 text-white;
   }
-  
-  .model-badge:hover {
-    @apply bg-secondary-600/40;
-  }
-  
-  .prompt-card {
-    @apply bg-background-paper rounded-md p-4;
-    @apply transition-all duration-200 border border-transparent;
-    @apply hover:border-primary-700 hover:shadow-lg;
-  }
-  
-  .prompt-card.selected {
-    @apply border-primary-500 bg-background-paper;
+  .tile-dark-2 {
+    @apply bg-tile-2 text-white;
   }
 
-  .input-field {
-    @apply w-full px-3 py-2 bg-background-dark rounded-md;
-    @apply border border-gray-700 focus:border-primary-500;
-    @apply outline-none focus:ring-1 focus:ring-primary-500;
-    @apply text-white placeholder-gray-400;
+  /* Store utility card - white card at 18px radius with hairline */
+  .store-utility-card {
+    @apply bg-canvas border border-hairline rounded-lg p-lg;
+  }
+
+  /* Tag / Model badges - pill chips */
+  .tag-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-pill text-caption font-normal;
+    @apply bg-canvas-parchment text-ink border border-hairline;
     @apply transition-all duration-200;
   }
-  
-  .btn {
-    @apply px-4 py-2 rounded-md font-medium;
+  .tag-badge:hover {
+    @apply bg-white;
+  }
+  .model-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-pill text-caption font-normal;
+    @apply bg-canvas-parchment text-ink border border-hairline;
     @apply transition-all duration-200;
-    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background-paper;
+  }
+  .model-badge:hover {
+    @apply bg-white;
+  }
+  
+  /* Prompt card - Apple store utility card */
+  .prompt-card {
+    @apply bg-canvas rounded-lg p-4 border border-hairline;
+    @apply transition-all duration-200;
+  }
+  .prompt-card:hover {
+    @apply border-zinc-300;
+  }
+  .prompt-card.selected {
+    @apply border-primary border-2;
+  }
+
+  /* Search input - pill shaped */
+  .input-field {
+    @apply w-full px-5 py-3 bg-canvas rounded-pill text-body;
+    @apply border border-[rgba(0,0,0,0.08)] focus:border-primary;
+    @apply outline-none focus:ring-2 focus:ring-primary/20;
+    @apply text-ink placeholder:text-ink-muted-48;
+    @apply transition-all duration-200;
+    height: 44px;
+  }
+  /* Textarea variant - keep pill for search only, use lg for textareas */
+  textarea.input-field {
+    @apply rounded-lg;
+    height: auto;
+  }
+
+  /* Buttons - Apple grammars */
+  .btn {
+    @apply inline-flex items-center justify-center font-normal;
+    @apply transition-all duration-200;
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus;
+    @apply active:scale-[0.95];
   }
   
   .btn-primary {
-    @apply btn bg-primary-600 hover:bg-primary-700 focus:ring-primary-500;
-    @apply text-white;
+    @apply btn bg-primary text-white rounded-pill px-[22px] py-[11px] text-body;
+    @apply hover:bg-primary focus-visible:outline-primary-focus;
   }
   
+  .btn-secondary-pill {
+    @apply btn bg-transparent text-primary border border-primary rounded-pill px-[22px] py-[11px] text-body;
+    @apply hover:bg-primary/5;
+  }
+
+  .btn-dark-utility {
+    @apply btn bg-ink text-white rounded-sm px-[15px] py-[8px] text-button-utility;
+  }
+
+  .btn-pearl-capsule {
+    @apply btn bg-pearl text-ink-muted-80 rounded-md px-[14px] py-[8px] text-caption border border-divider-soft;
+  }
+
+  .btn-store-hero {
+    @apply btn bg-primary text-white rounded-pill px-[28px] py-[14px] text-button-large font-light;
+  }
+
   .btn-secondary {
-    @apply btn bg-secondary-600 hover:bg-secondary-700 focus:ring-secondary-500;
-    @apply text-white;
+    @apply btn bg-tile-1 text-white rounded-sm px-4 py-2 text-button-utility hover:bg-tile-2;
   }
   
   .btn-danger {
-    @apply btn bg-error-600 hover:bg-error-700 focus:ring-error-500;
-    @apply text-white;
+    @apply btn bg-red-600 hover:bg-red-700 text-white rounded-pill px-[22px] py-[11px] text-body;
   }
   
   .btn-ghost {
-    @apply btn bg-transparent hover:bg-gray-700/50;
-    @apply text-gray-300 hover:text-white;
+    @apply btn bg-transparent hover:bg-black/5 text-ink rounded-pill px-4 py-2 text-button-utility;
+  }
+
+  .btn-icon-circular {
+    @apply w-11 h-11 rounded-full bg-chip-translucent backdrop-blur-sm;
+    @apply inline-flex items-center justify-center text-ink;
+    @apply hover:bg-chip-translucent/80 transition-colors;
+  }
+
+  /* Frosted sub-nav */
+  .sub-nav-frosted {
+    @apply bg-canvas-parchment/80 backdrop-blur-[20px] backdrop-saturate-[180%];
+    @apply border-b border-[rgba(0,0,0,0.08)];
   }
 }

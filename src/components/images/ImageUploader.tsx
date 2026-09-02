@@ -22,11 +22,9 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ promptId }) => {
     setIsLoading(true);
     
     try {
-      // Process each file
       const filePromises = Array.from(files).map(file => processFile(file));
       await Promise.all(filePromises);
       
-      // Reset input
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -40,15 +38,13 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ promptId }) => {
   
   const processFile = (file: File) => {
     return new Promise<void>((resolve, reject) => {
-      // Check file type
       if (!file.type.startsWith('image/')) {
         addToast('error', `${file.name} is not an image file`);
         reject(new Error('Not an image file'));
         return;
       }
       
-      // Check file size (max 5MB)
-      const maxSize = 5 * 1024 * 1024; // 5MB
+      const maxSize = 5 * 1024 * 1024;
       if (file.size > maxSize) {
         addToast('error', `${file.name} exceeds maximum size of 5MB`);
         reject(new Error('File too large'));
@@ -88,14 +84,14 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ promptId }) => {
       <button
         onClick={handleClick}
         disabled={isLoading}
-        className={`btn-secondary text-sm py-1 flex items-center ${
-          isLoading ? 'opacity-70 cursor-not-allowed' : ''
+        className={`btn-pearl-capsule flex items-center ${
+          isLoading ? 'opacity-60 cursor-not-allowed' : ''
         }`}
       >
         {isLoading ? (
-          <Loader className="h-4 w-4 mr-1 animate-spin" />
+          <Loader className="h-4 w-4 mr-1.5 animate-spin" />
         ) : (
-          <Upload className="h-4 w-4 mr-1" />
+          <Upload className="h-4 w-4 mr-1.5" />
         )}
         Upload
       </button>

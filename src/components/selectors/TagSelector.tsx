@@ -14,13 +14,11 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedTags, onChange }) => 
   const [isAdding, setIsAdding] = useState(false);
   const [newTagName, setNewTagName] = useState('');
   
-  // Filter tags based on search
   const filteredTags = tags.filter(tag => 
     tag.label.toLowerCase().includes(searchText.toLowerCase()) &&
     !selectedTags.includes(tag.id)
   );
   
-  // Add a tag to selection
   const handleAddTag = (tagId: string) => {
     if (!selectedTags.includes(tagId)) {
       onChange([...selectedTags, tagId]);
@@ -28,12 +26,10 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedTags, onChange }) => 
     setSearchText('');
   };
   
-  // Remove a tag from selection
   const handleRemoveTag = (tagId: string) => {
     onChange(selectedTags.filter(id => id !== tagId));
   };
   
-  // Create a new tag
   const handleCreateTag = () => {
     if (newTagName.trim()) {
       const newTagId = addTag(newTagName.trim());
@@ -43,17 +39,15 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedTags, onChange }) => 
     }
   };
   
-  // Get selected tags objects
   const selectedTagObjects = selectedTags
     .map(id => tags.find(tag => tag.id === id))
     .filter(Boolean) as typeof tags;
   
   return (
     <div className="space-y-3">
-      {/* Selected tags */}
       <div className="flex flex-wrap gap-2">
         {selectedTagObjects.length === 0 ? (
-          <div className="text-sm text-gray-500 italic">No tags selected</div>
+          <div className="text-caption text-ink-muted-48 italic">No tags selected</div>
         ) : (
           selectedTagObjects.map(tag => (
             <TagBadge 
@@ -65,11 +59,10 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedTags, onChange }) => 
         )}
       </div>
       
-      {/* Add new tag toggle */}
       {!isAdding ? (
         <button
           onClick={() => setIsAdding(true)}
-          className="text-sm text-primary-400 hover:text-primary-300 flex items-center"
+          className="text-caption text-primary hover:text-primary-focus flex items-center"
         >
           <Plus className="h-3 w-3 mr-1" />
           Add Tag
@@ -78,7 +71,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedTags, onChange }) => 
         <div className="flex items-center space-x-2">
           <input
             type="text"
-            className="input-field text-sm py-1"
+            className="input-field text-caption py-1.5"
             placeholder="Enter new tag name..."
             value={newTagName}
             onChange={(e) => setNewTagName(e.target.value)}
@@ -93,7 +86,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedTags, onChange }) => 
           />
           <button
             onClick={handleCreateTag}
-            className="btn-primary py-1 text-sm"
+            className="btn-primary py-1.5 text-caption"
             disabled={!newTagName.trim()}
           >
             Add
@@ -103,23 +96,22 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedTags, onChange }) => 
               setIsAdding(false);
               setNewTagName('');
             }}
-            className="btn-ghost py-1 text-sm"
+            className="btn-ghost py-1.5 text-caption"
           >
             Cancel
           </button>
         </div>
       )}
       
-      {/* Tag search */}
       {!isAdding && tags.length > 0 && (
         <div>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-3 w-3 text-gray-400" />
+              <Search className="h-3 w-3 text-ink-muted-48" />
             </div>
             <input
               type="text"
-              className="input-field text-sm pl-8 py-1.5"
+              className="input-field text-caption pl-8 py-2"
               placeholder="Search existing tags..."
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
@@ -127,9 +119,9 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedTags, onChange }) => 
           </div>
           
           {searchText && (
-            <div className="mt-2 max-h-32 overflow-y-auto scrollbar-thin bg-background-light rounded-md p-2">
+            <div className="mt-2 max-h-32 overflow-y-auto scrollbar-thin bg-canvas rounded-lg p-2 border border-hairline">
               {filteredTags.length === 0 ? (
-                <div className="text-sm text-gray-500 italic p-1">No matching tags</div>
+                <div className="text-caption text-ink-muted-48 italic p-1">No matching tags</div>
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {filteredTags.map(tag => (

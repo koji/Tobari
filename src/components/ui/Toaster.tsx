@@ -10,29 +10,28 @@ export const Toaster: React.FC = () => {
   return (
     <div className="fixed bottom-0 right-0 p-4 z-50 flex flex-col items-end space-y-2">
       {toasts.map(toast => {
-        const bgColor = 'bg-background-paper';
-        let icon = <Info className="h-5 w-5 text-white" />;
-        let borderColor = 'border-l-primary-500';
+        let icon = <Info className="h-5 w-5 text-primary" />;
+        let borderColor = 'border-l-primary';
         
         if (toast.type === 'success') {
-          icon = <CheckCircle className="h-5 w-5 text-success-500" />;
-          borderColor = 'border-l-success-500';
+          icon = <CheckCircle className="h-5 w-5 text-green-600" />;
+          borderColor = 'border-l-green-600';
         } else if (toast.type === 'error') {
-          icon = <AlertCircle className="h-5 w-5 text-error-500" />;
-          borderColor = 'border-l-error-500';
+          icon = <AlertCircle className="h-5 w-5 text-red-600" />;
+          borderColor = 'border-l-red-600';
         } else if (toast.type === 'info') {
-          icon = <Info className="h-5 w-5 text-primary-500" />;
-          borderColor = 'border-l-primary-500';
+          icon = <Info className="h-5 w-5 text-primary" />;
+          borderColor = 'border-l-primary';
         }
         
         return (
           <div
             key={toast.id}
-            className={`${bgColor} ${borderColor} border-l-4 rounded-md shadow-lg px-4 py-3 pr-8 min-w-64 max-w-sm animate-slide-in relative`}
+            className={`bg-canvas ${borderColor} border-l-4 rounded-lg shadow-product px-4 py-3 pr-8 min-w-64 max-w-sm animate-slide-in relative border border-hairline`}
           >
             <button
               onClick={() => removeToast(toast.id)}
-              className="absolute top-1 right-1 text-gray-400 hover:text-white p-1 rounded-full"
+              className="absolute top-1 right-1 text-ink-muted-48 hover:text-ink p-1 rounded-full"
             >
               <X className="h-4 w-4" />
             </button>
@@ -42,7 +41,7 @@ export const Toaster: React.FC = () => {
                 {icon}
               </div>
               <div>
-                <p className="text-sm text-white">{toast.message}</p>
+                <p className="text-caption text-ink">{toast.message}</p>
               </div>
             </div>
           </div>

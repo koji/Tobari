@@ -14,11 +14,11 @@ const Sidebar: React.FC = () => {
   };
   
   return (
-    <div className="h-full flex flex-col bg-background-paper">
-      <div className="p-4 border-b border-gray-800">
+    <div className="h-full flex flex-col bg-canvas">
+      <div className="p-6 border-b border-hairline">
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-4 w-4 text-gray-400" />
+          <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+            <Search className="h-3.5 w-3.5 text-ink-muted-48" />
           </div>
           <input
             type="text"
@@ -30,42 +30,42 @@ const Sidebar: React.FC = () => {
         </div>
       </div>
       
-      <div className="p-4 border-b border-gray-800">
+      <div className="p-6 border-b border-hairline">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center">
-            <Tag className="h-4 w-4 text-primary-400 mr-2" />
-            <h3 className="font-medium text-sm text-gray-300">Tags</h3>
+            <Tag className="h-4 w-4 text-primary mr-2" />
+            <h3 className="text-caption-strong text-ink">Tags</h3>
           </div>
-          <span className="text-xs text-gray-500">{tags.length} tags</span>
+          <span className="text-fine-print text-ink-muted-48">{tags.length} tags</span>
         </div>
         <TagFilter />
       </div>
       
-      <div className="p-4 border-b border-gray-800">
+      <div className="p-6 border-b border-hairline">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center">
-            <Cpu className="h-4 w-4 text-secondary-400 mr-2" />
-            <h3 className="font-medium text-sm text-gray-300">AI Models</h3>
+            <Cpu className="h-4 w-4 text-ink mr-2" />
+            <h3 className="text-caption-strong text-ink">AI Models</h3>
           </div>
-          <span className="text-xs text-gray-500">{models.length} models</span>
+          <span className="text-fine-print text-ink-muted-48">{models.length} models</span>
         </div>
         <ModelFilter />
       </div>
       
-      <div className="p-4 border-b border-gray-800">
+      <div className="p-6 border-b border-hairline">
         <div className="flex items-center mb-3">
-          <SlidersHorizontal className="h-4 w-4 text-gray-400 mr-2" />
-          <h3 className="font-medium text-sm text-gray-300">Sort</h3>
+          <SlidersHorizontal className="h-4 w-4 text-ink-muted-80 mr-2" />
+          <h3 className="text-caption-strong text-ink">Sort</h3>
         </div>
         <SortControl />
       </div>
       
-      <div className="px-4 py-2 border-b border-gray-800">
+      <div className="px-6 py-4 border-b border-hairline">
         <button 
-          className="btn-ghost text-sm w-full flex items-center justify-center"
+          className="btn-ghost text-caption w-full flex items-center justify-center"
           onClick={resetFilters}
         >
-          <RotateCcw className="h-3 w-3 mr-1" />
+          <RotateCcw className="h-3 w-3 mr-1.5" />
           Reset Filters
         </button>
       </div>

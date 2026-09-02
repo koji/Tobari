@@ -38,7 +38,6 @@ const PromptView: React.FC = () => {
     
   const promptImages = images.filter(img => img.promptId === selectedPromptId);
   
-  // Load prompt data when selection changes
   useEffect(() => {
     if (selectedPrompt) {
       setTitle(selectedPrompt.title);
@@ -49,14 +48,12 @@ const PromptView: React.FC = () => {
       setNotes(selectedPrompt.notes);
       setHasChanges(false);
       
-      // Auto-resize textareas
       setTimeout(() => {
         autoResizeTextarea(promptRef.current);
         autoResizeTextarea(negativePromptRef.current);
         autoResizeTextarea(notesRef.current);
       }, 0);
     } else {
-      // Reset form when no prompt is selected
       setTitle('');
       setPrompt('');
       setNegativePrompt('');
@@ -67,7 +64,6 @@ const PromptView: React.FC = () => {
     }
   }, [selectedPrompt]);
   
-  // Check for changes to enable/disable save button
   useEffect(() => {
     if (!selectedPrompt) return;
     
@@ -82,7 +78,6 @@ const PromptView: React.FC = () => {
     setHasChanges(hasChanged);
   }, [title, prompt, negativePrompt, tags, aiModels, notes, selectedPrompt]);
   
-  // Helper to compare arrays
   const arraysEqual = (a: string[], b: string[]) => {
     if (a.length !== b.length) return false;
     const sortedA = [...a].sort();
@@ -90,7 +85,6 @@ const PromptView: React.FC = () => {
     return sortedA.every((val, idx) => val === sortedB[idx]);
   };
   
-  // Auto-resize textarea
   const autoResizeTextarea = (textarea: HTMLTextAreaElement | null) => {
     if (!textarea) return;
     
@@ -138,11 +132,10 @@ const PromptView: React.FC = () => {
     selectPrompt(null);
   };
   
-  // Render empty state if no prompt is selected
   if (!selectedPrompt) {
     return (
       <EmptyState 
-        icon={<Info size={48} className="text-gray-600" />}
+        icon={<Info size={48} className="text-ink-muted-48" />}
         title="No Prompt Selected"
         description="Select a prompt from the list or create a new one to get started."
       />
@@ -153,152 +146,168 @@ const PromptView: React.FC = () => {
   const updatedDate = new Date(selectedPrompt.updated_at);
   
   return (
-    <div className="h-full flex flex-col bg-background-default">
-      {/* Header with actions */}
-      <div className="border-b border-gray-800 flex items-center justify-between p-4 bg-background-paper">
+    <div className="h-full flex flex-col bg-canvas-parchment">
+      {/* Sticky action bar - floating-sticky-bar style */}
+      <div className="sub-nav-frosted flex items-center justify-between px-6 py-3 sticky top-0 z-10">
         <button 
           onClick={handleBack}
-          className="flex items-center text-gray-400 hover:text-white lg:hidden"
+          className="flex items-center text-primary hover:text-primary-focus lg:hidden text-caption"
         >
-          <ChevronLeft className="h-5 w-5 mr-1" />
+          <ChevronLeft className="h-4 w-4 mr-1" />
           Back
         </button>
         
-        <div className="flex items-center space-x-2 ml-auto">
+        <div className="hidden lg:block text-caption text-ink-muted-80">
+          Editing
+        </div>
+        
+        <div className="flex items-center gap-3 ml-auto">
           <button
             onClick={() => setShowDeleteConfirm(true)}
-            className="btn-ghost text-sm"
+            className="btn-ghost text-caption"
           >
-            <Trash2 className="h-4 w-4 mr-1" />
+            <Trash2 className="h-4 w-4 mr-1.5" />
             Delete
           </button>
           
           <button
             onClick={handleSave}
             disabled={!hasChanges}
-            className={`btn-primary text-sm ${!hasChanges ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`btn-primary text-caption-strong ${!hasChanges ? 'opacity-40 cursor-not-allowed' : ''}`}
           >
-            <Save className="h-4 w-4 mr-1" />
+            <Save className="h-4 w-4 mr-1.5" />
             Save
           </button>
         </div>
       </div>
       
-      {/* Prompt form */}
-      <div className="flex-1 overflow-y-auto p-6 scrollbar-thin space-y-6">
-        {/* Title */}
-        <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-300 mb-1">
-            Title
-          </label>
-          <input
-            id="title"
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="input-field"
-            placeholder="Give your prompt a descriptive title..."
-          />
-        </div>
-        
-        {/* Main prompt */}
-        <div>
-          <label htmlFor="prompt" className="block text-sm font-medium text-gray-300 mb-1">
-            Prompt
-          </label>
-          <textarea
-            id="prompt"
-            ref={promptRef}
-            value={prompt}
-            onChange={handlePromptChange}
-            className="input-field min-h-24 resize-none"
-            placeholder="Enter your main prompt text here..."
-          />
-        </div>
-        
-        {/* Negative prompt */}
-        <div>
-          <label htmlFor="negative-prompt" className="block text-sm font-medium text-gray-300 mb-1">
-            Negative Prompt
-          </label>
-          <textarea
-            id="negative-prompt"
-            ref={negativePromptRef}
-            value={negativePrompt}
-            onChange={handleNegativePromptChange}
-            className="input-field min-h-20 resize-none"
-            placeholder="Enter things to avoid in the generation..."
-          />
-        </div>
-        
-        {/* Tags */}
-        <div>
-          <label htmlFor="tags" className="block text-sm font-medium text-gray-300 mb-2">
-            Tags
-          </label>
-          <TagSelector 
-            selectedTags={tags} 
-            onChange={setTags} 
-          />
-        </div>
-        
-        {/* AI Models */}
-        <div>
-          <label htmlFor="ai-models" className="block text-sm font-medium text-gray-300 mb-2">
-            AI Models
-          </label>
-          <ModelSelector 
-            selectedModels={aiModels} 
-            onChange={setAiModels} 
-          />
-        </div>
-        
-        {/* Notes */}
-        <div>
-          <label htmlFor="notes" className="block text-sm font-medium text-gray-300 mb-1">
-            Notes
-          </label>
-          <textarea
-            id="notes"
-            ref={notesRef}
-            value={notes}
-            onChange={handleNotesChange}
-            className="input-field min-h-20 resize-none"
-            placeholder="Add notes about this prompt, settings, or other tips..."
-          />
-        </div>
-        
-        {/* Images */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <label className="block text-sm font-medium text-gray-300">
-              <div className="flex items-center">
-                <ImageIcon className="h-4 w-4 mr-2 text-gray-400" />
-                Images
-              </div>
+      {/* Prompt form - alternating tile rhythm */}
+      <div className="flex-1 overflow-y-auto scrollbar-thin">
+        {/* Title tile - light */}
+        <div className="bg-canvas px-6 lg:px-12 py-12 lg:py-section">
+          <div className="max-w-content mx-auto">
+            <label htmlFor="title" className="block text-caption-strong text-ink mb-2">
+              Title
             </label>
-            <ImageUploader promptId={selectedPrompt.id} />
+            <input
+              id="title"
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full bg-transparent border-0 border-b border-hairline rounded-none px-0 py-3 text-display-md text-ink placeholder:text-ink-muted-48 focus:outline-none focus:border-primary focus:ring-0"
+              placeholder="Give your prompt a descriptive title..."
+            />
           </div>
-          
-          <ImageGallery 
-            promptId={selectedPrompt.id} 
-            images={promptImages} 
-          />
         </div>
         
-        {/* Metadata */}
-        <div className="pt-4 border-t border-gray-800 text-xs text-gray-500 flex items-center">
-          <Clock className="h-3 w-3 mr-1" />
-          <span>
-            Created: {format(createdDate, 'PPP')}
-            {createdDate.getTime() !== updatedDate.getTime() && 
-              ` • Updated: ${format(updatedDate, 'PPP')}`
-            }
-          </span>
+        {/* Main prompt tile - parchment */}
+        <div className="bg-canvas-parchment px-6 lg:px-12 py-12">
+          <div className="max-w-content mx-auto space-y-10">
+            <div className="store-utility-card">
+              <label htmlFor="prompt" className="block text-caption-strong text-ink mb-3">
+                Prompt
+              </label>
+              <textarea
+                id="prompt"
+                ref={promptRef}
+                value={prompt}
+                onChange={handlePromptChange}
+                className="w-full bg-canvas-parchment border border-hairline rounded-lg px-4 py-3 text-body text-ink placeholder:text-ink-muted-48 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 min-h-24 resize-none"
+                placeholder="Enter your main prompt text here..."
+              />
+            </div>
+            
+            <div className="store-utility-card">
+              <label htmlFor="negative-prompt" className="block text-caption-strong text-ink mb-3">
+                Negative Prompt
+              </label>
+              <textarea
+                id="negative-prompt"
+                ref={negativePromptRef}
+                value={negativePrompt}
+                onChange={handleNegativePromptChange}
+                className="w-full bg-canvas-parchment border border-hairline rounded-lg px-4 py-3 text-body text-ink placeholder:text-ink-muted-48 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 min-h-20 resize-none"
+                placeholder="Enter things to avoid in the generation..."
+              />
+            </div>
+          </div>
+        </div>
+        
+        {/* Tags / Models - light tile */}
+        <div className="bg-canvas px-6 lg:px-12 py-12">
+          <div className="max-w-content mx-auto grid gap-8">
+            <div className="store-utility-card">
+              <label className="block text-caption-strong text-ink mb-4">
+                Tags
+              </label>
+              <TagSelector 
+                selectedTags={tags} 
+                onChange={setTags} 
+              />
+            </div>
+            
+            <div className="store-utility-card">
+              <label className="block text-caption-strong text-ink mb-4">
+                AI Models
+              </label>
+              <ModelSelector 
+                selectedModels={aiModels} 
+                onChange={setAiModels} 
+              />
+            </div>
+          </div>
+        </div>
+        
+        {/* Notes + Images - parchment */}
+        <div className="bg-canvas-parchment px-6 lg:px-12 py-12">
+          <div className="max-w-content mx-auto space-y-8">
+            <div className="store-utility-card">
+              <label htmlFor="notes" className="block text-caption-strong text-ink mb-3">
+                Notes
+              </label>
+              <textarea
+                id="notes"
+                ref={notesRef}
+                value={notes}
+                onChange={handleNotesChange}
+                className="w-full bg-canvas-parchment border border-hairline rounded-lg px-4 py-3 text-body text-ink placeholder:text-ink-muted-48 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 min-h-20 resize-none"
+                placeholder="Add notes about this prompt, settings, or other tips..."
+              />
+            </div>
+            
+            <div className="store-utility-card">
+              <div className="flex items-center justify-between mb-4">
+                <label className="block text-caption-strong text-ink">
+                  <span className="flex items-center">
+                    <ImageIcon className="h-4 w-4 mr-2 text-ink-muted-80" />
+                    Images
+                  </span>
+                </label>
+                <ImageUploader promptId={selectedPrompt.id} />
+              </div>
+              
+              <ImageGallery 
+                promptId={selectedPrompt.id} 
+                images={promptImages} 
+              />
+            </div>
+          </div>
+        </div>
+        
+        {/* Metadata - light tile with fine print */}
+        <div className="bg-canvas px-6 lg:px-12 py-6 border-t border-hairline">
+          <div className="max-w-content mx-auto flex items-center text-fine-print text-ink-muted-48">
+            <Clock className="h-3 w-3 mr-1.5" />
+            <span>
+              Created: {format(createdDate, 'PPP')}
+              {createdDate.getTime() !== updatedDate.getTime() && 
+                ` • Updated: ${format(updatedDate, 'PPP')}`
+              }
+            </span>
+          </div>
         </div>
       </div>
       
-      {/* Delete confirmation dialog */}
       <ConfirmDialog
         isOpen={showDeleteConfirm}
         title="Delete Prompt"

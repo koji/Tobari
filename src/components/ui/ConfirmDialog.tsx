@@ -24,7 +24,6 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 }) => {
   const dialogRef = useRef<HTMLDivElement>(null);
   
-  // Focus trap and escape key handling
   useEffect(() => {
     if (!isOpen) return;
     
@@ -45,53 +44,49 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black bg-opacity-75 transition-opacity"
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
         onClick={onCancel}
       />
       
-      {/* Dialog */}
       <div className="flex min-h-full items-center justify-center p-4 text-center">
         <div 
           ref={dialogRef}
-          className="w-full max-w-md transform overflow-hidden rounded-lg bg-background-paper text-left align-middle shadow-xl transition-all animate-slide-in"
+          className="w-full max-w-md transform overflow-hidden rounded-lg bg-canvas text-left align-middle shadow-product transition-all animate-slide-in border border-hairline"
         >
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-800">
+          <div className="flex items-center justify-between p-6 border-b border-hairline">
             <div className="flex items-center">
               {isDestructive && (
-                <AlertTriangle className="h-5 w-5 text-error-500 mr-2" />
+                <AlertTriangle className="h-5 w-5 text-red-600 mr-2" />
               )}
-              <h3 className="text-lg font-medium text-white">
+              <h3 className="text-body-strong text-ink">
                 {title}
               </h3>
             </div>
             <button
-              className="text-gray-400 hover:text-white"
+              className="btn-icon-circular !w-8 !h-8"
               onClick={onCancel}
+              aria-label="Close"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4" />
             </button>
           </div>
           
-          {/* Content */}
           <div className="p-6">
-            <p className="text-sm text-gray-300">
+            <p className="text-body text-ink-muted-80">
               {message}
             </p>
           </div>
           
-          {/* Actions */}
-          <div className="px-4 py-3 flex justify-end space-x-3 border-t border-gray-800">
+          <div className="px-6 py-4 flex justify-end space-x-3 bg-canvas-parchment rounded-b-lg">
             <button
-              className="btn-ghost text-sm"
+              className="btn-pearl-capsule"
               onClick={onCancel}
             >
               {cancelText}
             </button>
             <button
-              className={`btn text-sm ${isDestructive ? 'btn-danger' : 'btn-primary'}`}
+              className={`${isDestructive ? 'btn-danger' : 'btn-primary'}`}
               onClick={onConfirm}
             >
               {confirmText}

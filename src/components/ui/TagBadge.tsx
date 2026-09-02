@@ -17,13 +17,13 @@ const TagBadge: React.FC<TagBadgeProps> = ({
 }) => {
   return (
     <div 
-      className={`tag-badge cursor-pointer ${isSelected ? 'bg-primary-500/50' : ''}`}
+      className={`tag-badge cursor-pointer ${isSelected ? '!bg-primary !text-white !border-primary' : ''}`}
       onClick={onClick}
     >
       {tag.label}
       {!hideRemove && (
         <X 
-          className="ml-1 h-3 w-3 hover:text-white" 
+          className="ml-1 h-3 w-3 opacity-60 hover:opacity-100" 
           onClick={(e) => {
             e.stopPropagation();
             onClick();

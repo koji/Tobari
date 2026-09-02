@@ -15,3 +15,4 @@ The change has to pass the following
 - `bun run lint (oxlint)`
 - `npx knip --reporter json`
 - `bun run build`
+- `bun run electron:build`

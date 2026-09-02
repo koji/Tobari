@@ -9,12 +9,10 @@ const ModelFilter: React.FC = () => {
     const currentModels = filters.selectedModels;
     
     if (currentModels.includes(modelId)) {
-      // Remove model
       updateFilters({ 
         selectedModels: currentModels.filter(id => id !== modelId) 
       });
     } else {
-      // Add model
       updateFilters({ 
         selectedModels: [...currentModels, modelId] 
       });
@@ -23,7 +21,7 @@ const ModelFilter: React.FC = () => {
   
   if (models.length === 0) {
     return (
-      <div className="text-sm text-gray-500 italic">No models available</div>
+      <div className="text-caption text-ink-muted-48 italic">No models available</div>
     );
   }
   

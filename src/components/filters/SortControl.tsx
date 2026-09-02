@@ -7,12 +7,10 @@ const SortControl: React.FC = () => {
   
   const toggleSortField = (field: 'created_at' | 'updated_at') => {
     if (filters.sortBy === field) {
-      // Toggle direction if same field
       updateFilters({ 
         sortDir: filters.sortDir === 'asc' ? 'desc' : 'asc' 
       });
     } else {
-      // Change field, default to desc (newest first)
       updateFilters({ 
         sortBy: field,
         sortDir: 'desc'
@@ -23,8 +21,8 @@ const SortControl: React.FC = () => {
   return (
     <div className="grid grid-cols-2 gap-2">
       <button
-        className={`btn-ghost text-sm flex justify-center items-center py-1.5 ${
-          filters.sortBy === 'created_at' ? 'bg-background-light' : ''
+        className={`btn-ghost text-caption flex justify-center items-center py-2 rounded-pill border ${
+          filters.sortBy === 'created_at' ? 'bg-ink text-white border-ink' : 'bg-canvas border-hairline text-ink'
         }`}
         onClick={() => toggleSortField('created_at')}
       >
@@ -41,8 +39,8 @@ const SortControl: React.FC = () => {
       </button>
       
       <button
-        className={`btn-ghost text-sm flex justify-center items-center py-1.5 ${
-          filters.sortBy === 'updated_at' ? 'bg-background-light' : ''
+        className={`btn-ghost text-caption flex justify-center items-center py-2 rounded-pill border ${
+          filters.sortBy === 'updated_at' ? 'bg-ink text-white border-ink' : 'bg-canvas border-hairline text-ink'
         }`}
         onClick={() => toggleSortField('updated_at')}
       >
